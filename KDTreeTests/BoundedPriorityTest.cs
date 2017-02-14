@@ -1,13 +1,13 @@
-﻿namespace KDTreeTests
-{
-    using NUnit.Framework;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+namespace KDTreeTests
+{
     using Supercluster.KDTree;
 
-    [TestFixture]
+    [TestClass]
     public class BoundedPriorityTest
     {
-        [Test]
+        [TestMethod]
         public void InsertTest()
         {
             var bp = new BoundedPriorityList<int, double>(3, true)
@@ -19,9 +19,9 @@
                          };
 
 
-            Assert.That(bp[0], Is.EqualTo(2));
-            Assert.That(bp[1], Is.EqualTo(89));
-            Assert.That(bp[2], Is.EqualTo(23));
+            Assert.AreEqual(bp[0], 2);
+            Assert.AreEqual(bp[1], 89);
+            Assert.AreEqual(bp[2], 23);
         }
     }
 }
