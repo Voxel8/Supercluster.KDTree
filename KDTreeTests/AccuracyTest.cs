@@ -1,19 +1,14 @@
-﻿using KDTreeTests;
-
-using NUnit.Framework;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace KDTreeTests
 {
     using System.Linq;
-
-    using NUnit.Framework;
-
+    
     using Supercluster.KDTree;
-    using Supercluster.KDTree.Utilities;
 
     using static Supercluster.KDTree.Utilities.BinaryTreeNavigation;
 
-    [TestFixture]
+    [TestClass]
     public class AccuracyTest
     {
 
@@ -21,7 +16,7 @@ namespace KDTreeTests
         /// Should build the tree displayed in the article:
         /// https://en.wikipedia.org/wiki/K-d_tree
         /// </summary>
-        [Test]
+        [TestMethod]
         public void WikipediaBuildTests()
         {
             // Should generate the following tree:
@@ -49,12 +44,12 @@ namespace KDTreeTests
                 double.MinValue,
                 double.MaxValue);
 
-            Assert.That(tree.InternalPointArray[0], Is.EqualTo(points[0]));
-            Assert.That(tree.InternalPointArray[LeftChildIndex(0)], Is.EqualTo(points[1]));
-            Assert.That(tree.InternalPointArray[LeftChildIndex(LeftChildIndex(0))], Is.EqualTo(points[2]));
-            Assert.That(tree.InternalPointArray[RightChildIndex(LeftChildIndex(0))], Is.EqualTo(points[3]));
-            Assert.That(tree.InternalPointArray[RightChildIndex(0)], Is.EqualTo(points[4]));
-            Assert.That(tree.InternalPointArray[LeftChildIndex(RightChildIndex(0))], Is.EqualTo(points[5]));
+            Assert.AreEqual(tree.InternalPointArray[0], points[0]);
+            Assert.AreEqual(tree.InternalPointArray[LeftChildIndex(0)], points[1]);
+            Assert.AreEqual(tree.InternalPointArray[LeftChildIndex(LeftChildIndex(0))], points[2]);
+            Assert.AreEqual(tree.InternalPointArray[RightChildIndex(LeftChildIndex(0))], points[3]);
+            Assert.AreEqual(tree.InternalPointArray[RightChildIndex(0)], points[4]);
+            Assert.AreEqual(tree.InternalPointArray[LeftChildIndex(RightChildIndex(0))], points[5]);
         }
 
 
@@ -63,7 +58,7 @@ namespace KDTreeTests
         /// Should build the tree displayed in the article:
         /// https://en.wikipedia.org/wiki/K-d_tree
         /// </summary>
-        [Test]
+        [TestMethod]
         public void NodeNavigatorTests()
         {
             // Should generate the following tree:
@@ -88,27 +83,25 @@ namespace KDTreeTests
 
             var nav = tree.Navigator;
 
-            Assert.That(nav.Point, Is.EqualTo(points[0]));
-            Assert.That(nav.Left.Point, Is.EqualTo(points[1]));
-            Assert.That(nav.Left.Left.Point, Is.EqualTo(points[2]));
-            Assert.That(nav.Left.Right.Point, Is.EqualTo(points[3]));
-            Assert.That(nav.Right.Point, Is.EqualTo(points[4]));
-            Assert.That(nav.Right.Left.Point, Is.EqualTo(points[5]));
-
-
-
-            Assert.That(nav.Node, Is.EqualTo(nodes[0]));
-            Assert.That(nav.Left.Node, Is.EqualTo(nodes[1]));
-            Assert.That(nav.Left.Left.Node, Is.EqualTo(nodes[2]));
-            Assert.That(nav.Left.Right.Node, Is.EqualTo(nodes[3]));
-            Assert.That(nav.Right.Node, Is.EqualTo(nodes[4]));
-            Assert.That(nav.Right.Left.Node, Is.EqualTo(nodes[5]));
+            Assert.AreEqual(nav.Point, points[0]);
+            Assert.AreEqual(nav.Left.Point, points[1]);
+            Assert.AreEqual(nav.Left.Left.Point, points[2]);
+            Assert.AreEqual(nav.Left.Right.Point, points[3]);
+            Assert.AreEqual(nav.Right.Point, points[4]);
+            Assert.AreEqual(nav.Right.Left.Point, points[5]);
+            
+            Assert.AreEqual(nav.Node, nodes[0]);
+            Assert.AreEqual(nav.Left.Node, nodes[1]);
+            Assert.AreEqual(nav.Left.Left.Node, nodes[2]);
+            Assert.AreEqual(nav.Left.Right.Node, nodes[3]);
+            Assert.AreEqual(nav.Right.Node, nodes[4]);
+            Assert.AreEqual(nav.Right.Left.Node, nodes[5]);
         }
 
 
 
 
-        [Test]
+        [TestMethod]
         public void FindNearestNeighborTest()
         {
             var dataSize = 10000;
@@ -127,14 +120,14 @@ namespace KDTreeTests
                 var treeNearest = tree.NearestNeighbors(testData[i], 1);
                 var linearNearest = Utilities.LinearSearch(treePoints, treeNodes, testData[i], Utilities.L2Norm_Squared_Double);
 
-                Assert.That(Utilities.L2Norm_Squared_Double(testData[i], linearNearest.Item1), Is.EqualTo(Utilities.L2Norm_Squared_Double(testData[i], treeNearest[0].Item1)));
+                Assert.AreEqual(Utilities.L2Norm_Squared_Double(testData[i], linearNearest.Item1), Utilities.L2Norm_Squared_Double(testData[i], treeNearest[0].Item1));
 
                 // TODO: wrote linear search for both node and point arrays
-                Assert.That(treeNearest[0].Item2, Is.EqualTo(linearNearest.Item2));
+                Assert.AreEqual(treeNearest[0].Item2, linearNearest.Item2);
             }
         }
 
-        [Test]
+        [TestMethod]
         public void RadialSearchTest()
         {
             var dataSize = 10000;
@@ -159,12 +152,30 @@ namespace KDTreeTests
 
                 for (int j = 0; j < treeRadial.Length; j++)
                 {
-                    Assert.That(treeRadial[j].Item1, Is.EqualTo(linearRadial[j].Item1));
-                    Assert.That(treeRadial[j].Item2, Is.EqualTo(linearRadial[j].Item2));
+                    Assert.AreEqual(treeRadial[j].Item1, linearRadial[j].Item1);
+                    Assert.AreEqual(treeRadial[j].Item2, linearRadial[j].Item2);
                 }
 
 
             }
+        }
+
+        [TestMethod]
+        public void SkipTest() {
+            var points = new double[][]
+                            {
+                                 new double[] { 7, 2 }, new double[] { 5, 4 }, new double[] { 2, 3 },
+                                 new double[] { 4, 7 }, new double[] { 9, 6 }, new double[] { 8, 1 }
+                            };
+
+            var nodes = new string[] { "Eric", "Is", "A", "Really", "Stubborn", "Ferret" };
+
+            var tree = new KDTree<double, string>(2, points, nodes, Utilities.L2Norm_Squared_Double);
+
+            var neighbors = tree.NearestNeighbors(points[0], 1, (a, b) => b == "Eric" || b == "Ferret");
+
+            Assert.AreEqual(1, neighbors.Length);
+            Assert.AreEqual("Is", neighbors[0].Item2);
         }
     }
 }

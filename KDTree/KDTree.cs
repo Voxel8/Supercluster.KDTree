@@ -2,6 +2,8 @@
 // Copyright (c) Eric Regina. All rights reserved.
 // </copyright>
 
+using System.Reflection;
+
 namespace Supercluster.KDTree
 {
     using System;
@@ -29,7 +31,6 @@ namespace Supercluster.KDTree
     /// </remarks>
     /// <typeparam name="TDimension">The type of the dimension.</typeparam>
     /// <typeparam name="TNode">The type representing the actual node objects.</typeparam>
-    [Serializable]
     public class KDTree<TDimension, TNode>
         where TDimension : IComparable<TDimension>
     {
@@ -95,7 +96,7 @@ namespace Supercluster.KDTree
             if (searchWindowMinValue.Equals(default(TDimension)))
             {
                 var type = typeof(TDimension);
-                this.MinValue = (TDimension)type.GetField("MinValue").GetValue(type);
+                this.MinValue = (TDimension)type.GetRuntimeField("MinValue").GetValue(type);
             }
             else
             {
@@ -105,7 +106,7 @@ namespace Supercluster.KDTree
             if (searchWindowMaxValue.Equals(default(TDimension)))
             {
                 var type = typeof(TDimension);
-                this.MaxValue = (TDimension)type.GetField("MaxValue").GetValue(type);
+                this.MaxValue = (TDimension)type.GetRuntimeField("MaxValue").GetValue(type);
             }
             else
             {
@@ -128,12 +129,13 @@ namespace Supercluster.KDTree
         /// </summary>
         /// <param name="point">The point whose neighbors we search for.</param>
         /// <param name="neighbors">The number of neighbors to look for.</param>
+        /// <param name="skip">Optional filter function to skip certain nodes.</param>
         /// <returns>The</returns>
-        public Tuple<TDimension[], TNode>[] NearestNeighbors(TDimension[] point, int neighbors)
+        public Tuple<TDimension[], TNode>[] NearestNeighbors(TDimension[] point, int neighbors, Func<TDimension[], TNode, bool> skip = null)
         {
             var nearestNeighborList = new BoundedPriorityList<int, double>(neighbors, true);
             var rect = HyperRect<TDimension>.Infinite(this.Dimensions, this.MaxValue, this.MinValue);
-            this.SearchForNearestNeighbors(0, point, rect, 0, nearestNeighborList, double.MaxValue);
+            this.SearchForNearestNeighbors(0, point, rect, 0, nearestNeighborList, double.MaxValue, skip);
 
             return nearestNeighborList.ToResultSet(this);
         }
@@ -156,7 +158,8 @@ namespace Supercluster.KDTree
                     HyperRect<TDimension>.Infinite(this.Dimensions, this.MaxValue, this.MinValue),
                     0,
                     nearestNeighbors,
-                    radius);
+                    radius,
+                    null);
             }
             else
             {
@@ -166,7 +169,8 @@ namespace Supercluster.KDTree
                     HyperRect<TDimension>.Infinite(this.Dimensions, this.MaxValue, this.MinValue),
                     0,
                     nearestNeighbors,
-                    radius);
+                    radius,
+                    null);
             }
 
             return nearestNeighbors.ToResultSet(this);
@@ -265,13 +269,8 @@ namespace Supercluster.KDTree
         /// <param name="dimension">The current splitting dimension for this recursion branch.</param>
         /// <param name="nearestNeighbors">The <see cref="BoundedPriorityList{TElement,TPriority}"/> containing the nearest neighbors already discovered.</param>
         /// <param name="maxSearchRadiusSquared">The squared radius of the current largest distance to search from the <paramref name="target"/></param>
-        private void SearchForNearestNeighbors(
-            int nodeIndex,
-            TDimension[] target,
-            HyperRect<TDimension> rect,
-            int dimension,
-            BoundedPriorityList<int, double> nearestNeighbors,
-            double maxSearchRadiusSquared)
+        /// <param name="skip"></param>
+        private void SearchForNearestNeighbors(int nodeIndex, TDimension[] target, HyperRect<TDimension> rect, int dimension, BoundedPriorityList<int, double> nearestNeighbors, double maxSearchRadiusSquared, Func<TDimension[], TNode, bool> skip)
         {
             if (this.InternalPointArray.Length <= nodeIndex || nodeIndex < 0
                 || this.InternalPointArray[nodeIndex] == null)
@@ -306,7 +305,8 @@ namespace Supercluster.KDTree
                 nearerRect,
                 dimension + 1,
                 nearestNeighbors,
-                maxSearchRadiusSquared);
+                maxSearchRadiusSquared,
+                skip);
 
             // Walk down into the further branch but only if our capacity hasn't been reached
             // OR if there's a region in the further rectangle that's closer to the target than our
@@ -326,7 +326,8 @@ namespace Supercluster.KDTree
                             furtherRect,
                             dimension + 1,
                             nearestNeighbors,
-                            maxSearchRadiusSquared);
+                            maxSearchRadiusSquared,
+                            skip);
                     }
                 }
                 else
@@ -337,13 +338,14 @@ namespace Supercluster.KDTree
                         furtherRect,
                         dimension + 1,
                         nearestNeighbors,
-                        maxSearchRadiusSquared);
+                        maxSearchRadiusSquared,
+                        skip);
                 }
             }
 
             // Try to add the current node to our nearest neighbors list
             distanceSquaredToTarget = this.Metric(this.InternalPointArray[nodeIndex], target);
-            if (distanceSquaredToTarget.CompareTo(maxSearchRadiusSquared) <= 0)
+            if (distanceSquaredToTarget.CompareTo(maxSearchRadiusSquared) <= 0 && (skip == null || !skip(this.InternalPointArray[nodeIndex], this.InternalNodeArray[nodeIndex])))
             {
                 nearestNeighbors.Add(nodeIndex, distanceSquaredToTarget);
             }
