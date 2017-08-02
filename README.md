@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/1of1illcotn12e74?svg=true)](https://ci.appveyor.com/project/Voxel8/supercluster-kdtree)
+
 # Supercluster.KDTree
 This is a [KD-Tree](https://en.wikipedia.org/wiki/K-d_tree) written completely in C#.  This project originally 
 started as a fork of the KD-Tree Written by [CodeandCats](https://github.com/codeandcats), however, the 
