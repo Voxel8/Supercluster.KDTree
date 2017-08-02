@@ -1,8 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFrameworks>net461;netstandard1.4</TargetFrameworks>
     <AssemblyName>Supercluster.KDTree</AssemblyName>
     <RootNamespace>Supercluster.KDTree</RootNamespace>
+    <PackageId>Supercluster.KDTree</PackageId>
+    <PackageVersion>1.0.4</PackageVersion>
+    <PackageAuthors>Eric Regina</PackageAuthors>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/MathFerret1013/Supercluster.KDTree/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/MathFerret1013/Supercluster.KDTree</PackageProjectUrl>
+    <PackageIconUrl>http://mathferret1013.github.io/Supercluster.KDTree/icons/Help.png</PackageIconUrl>
+    <Description>This is an extremely-fast and easy to use KDTree written entirely in modern C#.  This is the fastest and simplest to use KDTree that I have been able to find for .NET.  The project has thorough documentation and is open-source.  This module is a part of the larger Supercluster project.
+
+Tutorials and Wiki: https://github.com/MathFerret1013/Supercluster.KDTree/wiki
+MSDN Style Docs: http://mathferret1013.github.io/Supercluster.KDTree
+GitHub: https://github.com/MathFerret1013/Supercluster.KDTree</Description>   
+    <PackageReleaseNotes>1.04: Built for AnyCPU</PackageReleaseNotes>
+    <Copyright>Copyright (c) Eric Regina. All rights reserved.</Copyright>
+    <PackageTags>kdtree tree machine learning supercluster clustering knn</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
