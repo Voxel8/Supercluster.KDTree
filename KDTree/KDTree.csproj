@@ -3,8 +3,11 @@
     <TargetFrameworks>net461;netstandard1.4</TargetFrameworks>
     <AssemblyName>Supercluster.KDTree</AssemblyName>
     <RootNamespace>Supercluster.KDTree</RootNamespace>
+    
+    <Version Condition="$(BuildVersion) != ''">$(BuildVersion)</Version>
+    <Version Condition="$(Version) == ''">1.0.5-dev</Version>
+    
     <PackageId>Supercluster.KDTree</PackageId>
-    <PackageVersion>1.0.5</PackageVersion>
     <PackageAuthors>Eric Regina</PackageAuthors>
     <PackageLicenseUrl>https://raw.githubusercontent.com/MathFerret1013/Supercluster.KDTree/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/MathFerret1013/Supercluster.KDTree</PackageProjectUrl>
